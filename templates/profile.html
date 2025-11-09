@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block body %}
+  <h3>Perfil</h3>
+  <p><strong>Usuario:</strong> {{ user.username }}</p>
+  <p><strong>Email:</strong> {{ user.email }}</p>
+  <p><a href="{{ url_for('change_password') }}">Cambiar contraseña</a></p>
+{% endblock %}

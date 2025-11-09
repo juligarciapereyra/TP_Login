@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block body %}
+<form method="post">
+  <label>Usuario</label><input name="username" required>
+  <label>Contraseña</label><input name="password" type="password" required>
+  <button>Iniciar sesión</button>
+</form>
+<p><a href="{{ url_for('reset_password_request') }}">¿Olvidaste tu contraseña?</a></p>
+{% endblock %}
