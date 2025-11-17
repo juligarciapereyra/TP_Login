@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Cuenta verificada{% endblock %}
+
+{% block body %}
+<div class="container" style="
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    text-align: center;
+">
+    <h2 style="color: #28a745; margin-bottom: 10px;">✔ ¡Tu cuenta fue verificada!</h2>
+    <p style="font-size: 1.1rem; color: #333; margin-bottom: 20px;">
+        La verificación se realizó con éxito. Ya podés iniciar sesión.
+    </p>
+
+    <a href="{{ url_for('login') }}" 
+       style="
+        display: inline-block;
+        padding: 12px 24px;
+        text-decoration: none;
+        background: #007bff;
+        color: white;
+        font-weight: bold;
+        border-radius: 8px;
+       ">
+        Iniciar sesión
+    </a>
+</div>
+{% endblock %}

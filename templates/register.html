@@ -1,9 +1,226 @@
 {% extends "base.html" %}
+
 {% block body %}
-<form method="post">
-  <label>Usuario</label><input name="username" required>
-  <label>Email</label><input name="email" type="email" required>
-  <label>Contraseña</label><input name="password" type="password" required>
-  <button>Registrarse</button>
+<h2>Crear cuenta</h2>
+
+<form id="registerForm" method="post" autocomplete="off" class="form">
+
+  <!-- Nombre completo -->
+  <label for="full_name">Nombre completo</label>
+  <input 
+      id="full_name"
+      name="nombre_completo"
+      required
+      minlength="3"
+      maxlength="60"
+      pattern="^[A-Za-zÁÉÍÓÚáéíóúÑñ ]+$"
+      title="Solo letras y espacios (mínimo 3 caracteres)"
+  >
+  <small id="full_name-error" class="error"></small>
+
+  <!-- Usuario -->
+  <label for="username">Usuario</label>
+  <input 
+      id="username" 
+      name="username" 
+      required 
+      minlength="3"
+      maxlength="30"
+      pattern="[A-Za-z0-9_]+"
+      title="Solo letras, números o guiones bajos (mínimo 3 caracteres)"
+  >
+  <small id="username-error" class="error"></small>
+
+  <!-- DNI -->
+  <label for="dni">DNI</label>
+  <input 
+      id="dni"
+      name="dni"
+      required
+      pattern="^[0-9]{7,10}$"
+      title="Debe contener solo números (7 a 10 dígitos)"
+      inputmode="numeric"
+  >
+  <small id="dni-error" class="error"></small>
+
+  <!-- Email -->
+  <label for="email">Email</label>
+  <input 
+      id="email"
+      name="email" 
+      type="email" 
+      required
+  >
+  <small id="email-error" class="error"></small>
+
+  <!-- Contraseña -->
+  <label for="password">Contraseña</label>
+  <div class="pass-wrapper">
+    <input 
+        id="password"
+        name="password" 
+        type="password" 
+        required
+        minlength="8"
+        autocomplete="new-password"
+    >
+    <button type="button" class="toggle-btn" onclick="togglePassword()">👁️</button>
+  </div>
+  <small id="password-error" class="error"></small>
+
+  <!-- Barra de fuerza -->
+  <div class="strength-meter">
+    <div id="strength-bar"></div>
+  </div>
+  <div id="password-strength" class="strength-box">Fuerza: <span id="strength-label">-</span></div>
+
+  <!-- Confirmar contraseña -->
+  <label for="confirm_password">Confirmar contraseña</label>
+  <div class="pass-wrapper">
+    <input 
+        id="confirm_password"
+        name="confirm_password"
+        type="password"
+        required
+        minlength="6"
+    >
+    <button type="button" class="toggle-btn" onclick="toggleConfirm()">👁️</button>
+  </div>
+  <small id="confirm-error" class="error"></small>
+
+  <button type="submit">Registrarse</button>
 </form>
+
+<style>
+  .form {
+    display: flex;
+    flex-direction: column;
+    width: 280px;
+    gap: 8px;
+  }
+
+  input {
+    padding: 6px;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+  }
+
+  .error {
+    color: red;
+    font-size: 12px;
+  }
+
+  /* Toggle */
+  .pass-wrapper {
+    position: relative;
+  }
+  .toggle-btn {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 0;
+  }
+
+  /* Strength bar */
+  .strength-meter {
+    width: 100%;
+    height: 6px;
+    background: #ddd;
+    border-radius: 4px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+  #strength-bar {
+    height: 100%;
+    width: 0%;
+    border-radius: 4px;
+    transition: width .3s;
+  }
+</style>
+
+<script>
+  const fullName = document.getElementById("full_name");
+  const username = document.getElementById("username");
+  const dni = document.getElementById("dni");
+  const email = document.getElementById("email");
+  const pwd = document.getElementById("password");
+  const confirmPwd = document.getElementById("confirm_password");
+
+  // Errores
+  const errFullName = document.getElementById("full_name-error");
+  const errUser = document.getElementById("username-error");
+  const errDni = document.getElementById("dni-error");
+  const errEmail = document.getElementById("email-error");
+  const errPwd = document.getElementById("password-error");
+  const errConfirm = document.getElementById("confirm-error");
+
+  // Validación en vivo: nombre completo
+  fullName.addEventListener("input", () => {
+    if (!fullName.checkValidity()) {
+      errFullName.textContent = "Solo letras y espacios, mínimo 3 caracteres";
+    } else {
+      errFullName.textContent = "";
+    }
+  });
+
+  // Validaciones live
+  username.addEventListener("input", () => {
+    errUser.textContent = username.checkValidity() ? "" :
+        "El usuario solo puede contener letras, números o _ (mínimo 3 caracteres)";
+  });
+
+  dni.addEventListener("input", () => {
+    errDni.textContent = dni.checkValidity() ? "" :
+        "DNI inválido (solo números, 7–10 dígitos)";
+  });
+
+  email.addEventListener("input", () => {
+    errEmail.textContent = email.checkValidity() ? "" : "Email inválido";
+  });
+
+  pwd.addEventListener("input", () => {
+    errPwd.textContent = pwd.checkValidity() ? "" :
+        "La contraseña debe tener al menos 6 caracteres";
+  });
+
+  confirmPwd.addEventListener("input", () => {
+    errConfirm.textContent = (pwd.value === confirmPwd.value) ? "" :
+        "Las contraseñas no coinciden";
+  });
+
+  // Fuerza de contraseña
+  function evaluarFuerza(pass) {
+    let score = 0;
+    if (pass.length >= 6) score++;
+    if (/[A-Z]/.test(pass)) score++;
+    if (/[0-9]/.test(pass)) score++;
+    if (/[^A-Za-z0-9]/.test(pass)) score++;
+    return score;
+  }
+
+  const bar = document.getElementById("strength-bar");
+  const label = document.getElementById("strength-label");
+
+  pwd.addEventListener("input", () => {
+    const s = evaluarFuerza(pwd.value);
+    const levels = ["Débil", "Débil", "Media", "Fuerte", "Muy fuerte"];
+    const colors = ["red", "red", "orange", "green", "#00b300"];
+    const widths = ["20%", "35%", "60%", "80%", "100%"];
+
+    label.textContent = levels[s];
+    bar.style.width = widths[s];
+    bar.style.background = colors[s];
+  });
+
+  // Toggles
+  function togglePassword() { pwd.type = pwd.type === "password" ? "text" : "password"; }
+  function toggleConfirm() { confirmPwd.type = confirmPwd.type === "password" ? "text" : "password"; }
+</script>
+
+
 {% endblock %}
