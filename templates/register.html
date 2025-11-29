@@ -31,18 +31,6 @@
   >
   <small id="username-error" class="error"></small>
 
-  <!-- DNI -->
-  <label for="dni">DNI</label>
-  <input 
-      id="dni"
-      name="dni"
-      required
-      pattern="^[0-9]{7,10}$"
-      title="Debe contener solo números (7 a 10 dígitos)"
-      inputmode="numeric"
-  >
-  <small id="dni-error" class="error"></small>
-
   <!-- Email -->
   <label for="email">Email</label>
   <input 
@@ -146,7 +134,6 @@
 <script>
   const fullName = document.getElementById("full_name");
   const username = document.getElementById("username");
-  const dni = document.getElementById("dni");
   const email = document.getElementById("email");
   const pwd = document.getElementById("password");
   const confirmPwd = document.getElementById("confirm_password");
@@ -154,7 +141,6 @@
   // Errores
   const errFullName = document.getElementById("full_name-error");
   const errUser = document.getElementById("username-error");
-  const errDni = document.getElementById("dni-error");
   const errEmail = document.getElementById("email-error");
   const errPwd = document.getElementById("password-error");
   const errConfirm = document.getElementById("confirm-error");
@@ -172,11 +158,6 @@
   username.addEventListener("input", () => {
     errUser.textContent = username.checkValidity() ? "" :
         "El usuario solo puede contener letras, números o _ (mínimo 3 caracteres)";
-  });
-
-  dni.addEventListener("input", () => {
-    errDni.textContent = dni.checkValidity() ? "" :
-        "DNI inválido (solo números, 7–10 dígitos)";
   });
 
   email.addEventListener("input", () => {

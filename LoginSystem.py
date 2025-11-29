@@ -34,9 +34,6 @@ EMAIL_REGEX = re.compile(r"^[\w\.-]+@[\w\.-]+\.\w+$")
 def is_valid_email(email: str) -> bool:
     return EMAIL_REGEX.match(email) is not None
 
-def is_valid_dni(dni: str) -> bool:
-    # allow-list estricta: SOLO dígitos, longitud valida la dejamos al frontend y al servidor (7-10)
-    return dni.isdigit() and 7 <= len(dni) <= 10
 
 def is_valid_name(name: str) -> bool:
     # allow-list básica: letras, espacios y acentos
@@ -59,7 +56,6 @@ def init_db():
             username TEXT UNIQUE NOT NULL,
             email TEXT UNIQUE NOT NULL,
             nombre_completo TEXT NOT NULL,
-            dni TEXT UNIQUE NOT NULL,
             password_hash TEXT NOT NULL,
             created_at TEXT NOT NULL,
             failed_attempts INTEGER DEFAULT 0,
@@ -131,15 +127,6 @@ def update_user_field(uid, field, value):
     conn.close()
 
 
-def find_user_by_dni(dni):
-    conn = get_db()
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM users WHERE dni = ?", (dni,))
-    row = cur.fetchone()
-    conn.close()
-    return row
-
-
 # ---------- Envío de email simulado ----------
 def send_email_verification(email, link):
     """
@@ -179,12 +166,11 @@ def register():
         username = request.form.get("username", "").strip()
         email = request.form.get("email", "").strip().lower()
         nombre_completo = request.form.get("nombre_completo", "").strip()
-        dni = request.form.get("dni", "").strip()
         password = request.form.get("password", "")
         confirm_password = request.form.get("confirm_password", "")
 
         # Campos obligatorios
-        if not username or not email or not nombre_completo or not dni or not password or not confirm_password:
+        if not username or not email or not nombre_completo or not password or not confirm_password:
             flash("Todos los campos son obligatorios.", "error")
             return redirect(url_for("register"))
         
@@ -215,14 +201,6 @@ def register():
             flash("El nombre solo puede contener letras y espacios.", "error")
             return redirect(url_for("register"))
 
-        if not is_valid_dni(dni):
-            flash("El DNI debe contener sólo números (7-10 dígitos).", "error")
-            return redirect(url_for("register"))
-        
-        existing_dni = find_user_by_dni(dni)
-        if existing_dni:
-            flash("Ese DNI ya está registrado.", "error")
-            return redirect(url_for("register"))
         
         if find_user_by_username(username):
             flash("Ese nombre de usuario ya existe.", "error")
@@ -241,9 +219,9 @@ def register():
         cur = conn.cursor()
 
         cur.execute("""
-            INSERT INTO users (username, email, nombre_completo, dni, password_hash, estado, created_at)
+            INSERT INTO users (username, email, nombre_completo, password_hash, estado, created_at)
             VALUES (?, ?, ?, ?, ?, 'PENDING', ?)
-        """, (username, email, nombre_completo, dni, pwd_hash, datetime.utcnow().isoformat()))
+        """, (username, email, nombre_completo, pwd_hash, datetime.utcnow().isoformat()))
         conn.commit()
         user_id = cur.lastrowid
 
